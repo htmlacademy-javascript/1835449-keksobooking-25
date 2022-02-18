@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг»
 
-* Студент: [Алеся Корень](https://up.htmlacademy.ru/javascript/25/user/1835449).
-* Наставник: `Неизвестно`.
+* Студент: [Алеся Корень](https://htmlacademy.ru/profile/lialemo).
+* Наставник: [Артём Рудов](https://htmlacademy.ru/profile/artrudov).
 
 ---
 
