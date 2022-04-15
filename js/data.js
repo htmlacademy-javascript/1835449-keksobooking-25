@@ -3,16 +3,16 @@ import {getRandomPositiveNumber, getRandomFloatNumber, getRandomElement, getRand
 const COUNT_ADS = 10;
 
 const OFFER_TITLES = [
-  'Заголовок объявления 1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '10'
+  'Отель в центре люкс-класса',
+  'Отель эконом-класса',
+  'Номер в отеле "Для двоих"',
+  'Дом с контактным зоопарком',
+  'Дом на краю города',
+  'Квартира рядом с парком',
+  'Дворец около моря',
+  'Дом "Для друзей"',
+  'Бунгало для вечеринок',
+  'Коммунальная квартира'
 ];
 
 const MIN_LAT = 35.65000;
@@ -50,16 +50,16 @@ const FEATURES = [
 ];
 
 const DESCRIPTIONS = [
-  'Описание помещеня 1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '10'
+  'Две жилые комнаты, санузел, мини-бар, телевизор и сейф, трансфер от точки прибытия',
+  'В номере 2 кровати, минимальный набор предметов быта',
+  'Wi-Fi, завтрак и чай, кондиционер, парковка с видеонаблюдением',
+  'На территории дома расположен контактный зоопарк, который можно посещать в любое время до 23:00',
+  'Маленький и уют дом с красивым видом из окна, где вас никто не потревожит',
+  'Свежий воздух и возможность устроить пикники прямо рядом с домом',
+  'Богатый дворец со всем необходимым, включая обслуживающий персонал',
+  'Здесь вы сможете отдохнуть компанией друзей, предоставляются развлекательные устройства по запросу',
+  'Есть оборудование для вечеринки, возможно заказать обслуживающий персонал',
+  'Проходная квартира с холодильником, стиральной машиной и телевизором'
 ];
 
 const PHOTOS = [
@@ -68,10 +68,10 @@ const PHOTOS = [
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/claire-rendall-b6kAwr1i0Iw.jpg'
 ];
 
-const createAd = (idx) => {
+const createCard = (index) => {
   const lat = getRandomFloatNumber(MIN_LAT, MAX_LAT, 5);
   const lng = getRandomFloatNumber(MIN_LNG, MAX_LNG, 5);
-  const currentIndex = idx + 1;
+  const currentIndex = index + 1;
 
   return {
     author: {
@@ -98,6 +98,6 @@ const createAd = (idx) => {
   };
 };
 
-const createAds = Array.from({length: COUNT_ADS}).map((item, idx) => createAd(idx));
+const createCards = Array.from({length: COUNT_ADS}).map((i, index) => createCard(index));
 
-export {createAds, COUNT_ADS};
+export {createCards};
