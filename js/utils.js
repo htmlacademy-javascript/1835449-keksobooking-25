@@ -31,12 +31,25 @@ const getRandomArray = (array) => {
   return newArray;
 };
 
-const addContent = (element, content) => {
-  if (content && !content.includes('undefined'))  {
-    element.textContent = content;
-  } else {
-    element.remove();
-  }
+const isEscapeKey = (evt) => evt.key === 'Escape';
+
+const showAlert = (status) => {
+  const alertTemplate = document.querySelector(`#${status}`).content.querySelector(`.${status}`);
+  const alertElement = alertTemplate.cloneNode(true);
+  document.body.append(alertElement);
+
+  document.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    alertElement.remove();
+  });
+
+  document.addEventListener('keydown', (evt) => {
+    if (isEscapeKey(evt)) {
+      evt.preventDefault();
+      alertElement.remove();
+    }
+  });
 };
 
-export {getRandomPositiveNumber, getRandomFloatNumber, getRandomElement, getRandomArray, addContent};
+export {getRandomPositiveNumber, getRandomFloatNumber, getRandomElement, getRandomArray, isEscapeKey,
+  showAlert};
