@@ -31,4 +31,12 @@ const getRandomArray = (array) => {
   return newArray;
 };
 
-export {getRandomPositiveNumber, getRandomFloatNumber, getRandomElement, getRandomArray};
+const addContent = (element, content) => {
+  if (content && !content.includes('undefined'))  {
+    element.textContent = content;
+  } else {
+    element.remove();
+  }
+};
+
+export {getRandomPositiveNumber, getRandomFloatNumber, getRandomElement, getRandomArray, addContent};
