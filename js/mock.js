@@ -100,4 +100,6 @@ const createCard = (index) => {
 
 const createCards = Array.from({length: COUNT_ADS}).map((i, index) => createCard(index));
 
-export {createCards};
+const similarCards = createCards();
+
+export {similarCards};
