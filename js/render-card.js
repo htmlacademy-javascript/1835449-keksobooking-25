@@ -1,14 +1,14 @@
 const RoomsType = {
-  FLAT: 'Квартира',
-  BUNGALOW: 'Бунгало',
-  HOUSE: 'Дом',
   PALACE: 'Дворец',
+  FLAT: 'Квартира',
+  HOUSE: 'Дом',
+  BUNGALOW: 'Бунгало',
   HOTEL: 'Отель'
 };
 
-const addContent = (element, content) => {
-  if (content && !content.includes('undefined'))  {
-    element.textContent = content;
+const addContent = (element, value) => {
+  if (value && !value.includes('undefined'))  {
+    element.textContent = value;
   } else {
     element.remove();
   }
@@ -18,6 +18,8 @@ const renderCard = ({author, offer}) => {
 
   const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
   const cardElement = cardTemplate.cloneNode(true);
+  const featuresList = cardElement.querySelector('.popup__features');
+  const gallery = cardElement.querySelector('.popup__photos');
 
   cardElement.querySelector('.popup__avatar').src = author.avatar;
   cardElement.querySelector('.popup__title').textContent = offer.title;
@@ -29,7 +31,6 @@ const renderCard = ({author, offer}) => {
   addContent(cardElement.querySelector('.popup__text--capacity'), `${offer.rooms} комнаты для ${offer.guests} гостей`);
   addContent(cardElement.querySelector('.popup__text--time'), `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`);
 
-  const featuresList = cardElement.querySelector('.popup__features');
   featuresList.textContent = '';
 
   if (offer.features) {
@@ -43,7 +44,6 @@ const renderCard = ({author, offer}) => {
     featuresList.remove();
   }
 
-  const gallery = cardElement.querySelector('.popup__photos');
   if (offer.photos) {
     offer.photos.forEach((item) => {
       const cardPhoto = document.createElement('img');
