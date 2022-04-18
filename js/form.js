@@ -61,6 +61,12 @@ sliderElement.noUiSlider.on('update', () => {
   validate(priceField);
 });
 
+// Синхронизируем положение слайдера при редактировании поля цена
+
+priceField.addEventListener('input', (evt)=>{
+  sliderElement.noUiSlider.set(Number(evt.target.value));
+});
+
 // Обработчик отправки формы
 
 adForm.addEventListener('submit', (evt) => {

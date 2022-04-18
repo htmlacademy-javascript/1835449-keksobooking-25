@@ -25,7 +25,7 @@ const isFitPrice = (card) => {
   let priceLevel = '';
   if (cardPrice < 10000) {
     priceLevel = FilterValue.LOW;
-  } else if (cardPrice >= 10000 & cardPrice < 50000) {
+  } else if (cardPrice >= 10000 && cardPrice < 50000) {
     priceLevel = FilterValue.MIDDLE;
   } else if (cardPrice >= 50000) {
     priceLevel = FilterValue.HIGH;
