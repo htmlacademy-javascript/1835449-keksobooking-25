@@ -8,7 +8,7 @@ let currentQuantity = 0;
 const resetPhotos = () => {
   offerPhotosPreview.textContent = '';
   avatarPreview.src = 'img/muffin-grey.svg';
-  offerPhotosChooser.removeAttribute('disabled', 'disabled');
+  offerPhotosChooser.removeAttribute('disabled');
   currentQuantity = 0;
 };
 
@@ -45,7 +45,7 @@ offerPhotosChooser.addEventListener('change', () => {
     }
 
     if (currentQuantity === MAX_PHOTO_QUANTITY) {
-      offerPhotosChooser.setAttribute('disabled', 'disabled');
+      offerPhotosChooser.setAttribute('disabled');
       let photoAlarm = offerPhotosPreview.querySelector('#photo-alarm');
       if (!photoAlarm) {
         photoAlarm = document.createElement('span');

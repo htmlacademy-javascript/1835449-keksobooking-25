@@ -14,6 +14,30 @@ const addContent = (element, value) => {
   }
 };
 
+const createPhotos = (gallery, photos) => {
+  photos.forEach((item) => {
+    const cardPhoto = document.createElement('img');
+
+    cardPhoto.classList.add('popup__photo');
+    cardPhoto.src = item;
+    cardPhoto.width = 45;
+    cardPhoto.height = 40;
+    cardPhoto.alt = 'Фотография жилья';
+
+    gallery.appendChild(cardPhoto);
+  });
+};
+
+const createFeatures = (featuresList, features) => {
+  features.map((item) => {
+    const featureItem = document.createElement('li');
+    featureItem.classList.add('popup__feature', `popup__feature--${item}`);
+    featureItem.textContent = item;
+
+    featuresList.appendChild(featureItem);
+  });
+};
+
 const renderCard = ({author, offer}) => {
 
   const cardTemplate = document.querySelector('#card').content.querySelector('.popup');
@@ -31,29 +55,16 @@ const renderCard = ({author, offer}) => {
   addContent(cardElement.querySelector('.popup__text--capacity'), `${offer.rooms} комнаты для ${offer.guests} гостей`);
   addContent(cardElement.querySelector('.popup__text--time'), `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`);
 
-  featuresList.textContent = '';
-
   if (offer.features) {
-    offer.features.map((item) => {
-      const featureItem = document.createElement('li');
-      featureItem.classList.add('popup__feature', `popup__feature--${item}`);
-      featureItem.textContent = item;
-      featuresList.appendChild(featureItem);
-    });
+    featuresList.innerHTML = '';
+    createFeatures(featuresList, offer.features);
   } else {
     featuresList.remove();
   }
 
   if (offer.photos) {
-    offer.photos.forEach((item) => {
-      const cardPhoto = document.createElement('img');
-      cardPhoto.classList.add('popup__photo');
-      cardPhoto.src = item;
-      cardPhoto.width = 45;
-      cardPhoto.height = 40;
-      cardPhoto.alt = 'Фотография жилья';
-      gallery.appendChild(cardPhoto);
-    });
+    gallery.innerHTML = '';
+    createPhotos(gallery, offer.photos);
   } else {
     gallery.remove();
   }
