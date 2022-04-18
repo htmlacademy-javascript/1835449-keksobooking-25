@@ -1,14 +1,26 @@
-import {renderCard} from './render-card.js';
 import {getData} from './api.js';
-import {showAlert} from './utils.js';
+import {renderCard} from './render-card.js';
+import {showAlert, debounce} from './utils.js';
 import {
   adForm,
   mapFilters,
   interactiveElements,
-  resetButton
-} from './constants.js';
+  filtersForm
+} from './elements.js';
+import {resetPhotos} from './photos.js';
+import {
+  filterCards,
+  updateCheckedFeatures
+} from './filters.js';
 
-// Блокировка страницы
+const Coords = {
+  LAT: 35.6895,
+  LNG: 139.692,
+};
+
+const CREATION_DELAY = 500;
+
+// Блокируем страницу
 
 const activatePage = (shouldActivate) => {
   adForm.classList[shouldActivate ? 'remove' : 'add']('ad-form--disabled');
@@ -16,22 +28,27 @@ const activatePage = (shouldActivate) => {
   interactiveElements.forEach((child) => child[shouldActivate ? 'removeAttribute' : 'setAttribute']('disabled', 'disabled'));
 };
 
-activatePage(false);
+// Инициализируем карту
 
-// Инициализация карты и активация страницы
-
-const COORDS = {
-  lat: 35.652832,
-  lng: 139.839478,
-};
+let dataCache = [];
 
 const map = L.map('map-canvas')
   .on('load', () => {
-    activatePage(true);
+    getData(
+      'https://25.javascript.pages.academy/keksobooking/data',
+      (cards) => {
+        dataCache = cards;
+        setCards();
+      },
+      () => {
+        showAlert('data-load-error');
+        mapFilters.classList.add('ad-form--disabled');
+      }
+    );
   })
   .setView({
-    lat: COORDS.lat,
-    lng: COORDS.lng,
+    lat: Coords.LAT,
+    lng: Coords.LNG,
   }, 12);
 
 L.tileLayer(
@@ -41,7 +58,7 @@ L.tileLayer(
   },
 ).addTo(map);
 
-// Создание главной метки
+// Создаем главную метку
 
 const mainPinIcon = L.icon({
   iconUrl: './img/main-pin.svg',
@@ -51,8 +68,8 @@ const mainPinIcon = L.icon({
 
 const mainPinMarker = L.marker(
   {
-    lat: COORDS.lat,
-    lng: COORDS.lng,
+    lat: Coords.LAT,
+    lng: Coords.LNG,
   },
   {
     draggable: true,
@@ -62,7 +79,7 @@ const mainPinMarker = L.marker(
 
 mainPinMarker.addTo(map);
 
-// Создание обычных меток
+// Создаем обычные метки
 
 const icon = L.icon({
   iconUrl: './img/pin.svg',
@@ -70,19 +87,7 @@ const icon = L.icon({
   iconAnchor: [20, 40],
 });
 
-// Получение адреса текущего pin
-
-const getCurrentAddress = (pin) => Object.values(pin.getLatLng()).map((item) => item.toFixed(5)).join(', ');
-const addressField = document.querySelector('.ad-form').querySelector('#address');
-
-addressField.value = getCurrentAddress(mainPinMarker);
-
-mainPinMarker.on('moveend', (evt) => {
-  const currentAddress = evt.target;
-  addressField.value = getCurrentAddress(currentAddress);
-});
-
-// Создание слоя с метками
+// Создаем слой с метками
 
 const markerGroup = L.layerGroup().addTo(map);
 
@@ -104,53 +109,54 @@ const createMarker = (card) => {
     .bindPopup(renderCard(card));
 };
 
-const CARDS_LENGTH = 10;
+// Получаем адрес текущего пина
 
-const setMarkers = () => {
-  getData(
-    (cards) => cards.slice(0, CARDS_LENGTH).forEach((card) => createMarker(card)),
-    () => showAlert('data-load-error')
-  );
+const getCurrentAddress = (pin) => Object.values(pin.getLatLng()).map((item) => item.toFixed(5)).join(', ');
+const addressField = document.querySelector('.ad-form').querySelector('#address');
+
+// Обновляем данные
+
+const onFilterChange = () => {
+  updateCheckedFeatures();
+  setCards();
 };
 
-setMarkers();
+// Очищаем данные
 
-// Очистка данных
 const resetData = () => {
-  markerGroup.clearLayers();
-
-  setMarkers();
+  adForm.reset();
+  mapFilters.reset();
+  resetPhotos();
+  setCards();
 
   mainPinMarker.setLatLng({
-    lat: COORDS.lat,
-    lng: COORDS.lng,
+    lat: Coords.LAT,
+    lng: Coords.LNG,
   });
   map.setView({
-    lat: COORDS.lat,
-    lng: COORDS.lng,
+    lat: Coords.LAT,
+    lng: Coords.LNG,
   }, 12);
 
   addressField.value = getCurrentAddress(mainPinMarker);
-  document.querySelector('#title').value = '';
-  document.querySelector('#description').value = '';
-  document.querySelector('#type').value = 'flat';
-  document.querySelector('#price').value = '1000';
-  document.querySelector('#room_number').value = '1';
-  document.querySelector('#capacity').value = '1';
-  document.querySelector('#timein').value = '12:00';
-  document.querySelector('#timeout').value = '12:00';
-  document.querySelectorAll('.features__checkbox').forEach((feature) => {feature.checked = false;});
-
-  document.querySelector('#housing-type').value = 'any';
-  document.querySelector('#housing-price').value = 'any';
-  document.querySelector('#housing-rooms').value = 'any';
-  document.querySelector('#housing-guests').value = 'any';
-  document.querySelectorAll('.map__checkbox').forEach((feature) => {feature.checked = false;});
 };
 
-resetButton.addEventListener('click', (evt) => {
-  evt.preventDefault();
-  resetData();
+function setCards() {
+  markerGroup.clearLayers();
+  const filteredData = filterCards(dataCache);
+  filteredData.forEach((card) => createMarker(card));
+  activatePage(true);
+}
+
+addressField.value = getCurrentAddress(mainPinMarker);
+
+mainPinMarker.on('moveend', (evt) => {
+  const currentAddress = evt.target;
+  addressField.value = getCurrentAddress(currentAddress);
 });
+
+// Обрабатываем изменения в фильтрации
+
+filtersForm.addEventListener('change', debounce(onFilterChange, CREATION_DELAY));
 
 export {resetData};

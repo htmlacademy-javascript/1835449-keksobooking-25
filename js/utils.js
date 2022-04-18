@@ -1,55 +1,106 @@
-const getRandomPositiveNumber = (min, max) => {
-  min = Math.ceil(Math.abs(min));
-  max = Math.floor(Math.abs(max));
-
-  if(min > max){
-    return max + Math.floor(Math.random() * (min + 1 - max));
+// Получение случайного целого числа в заданном интервале, включая числа границ интервала
+const getRandomInteger = (min = 0, max = 1000000) => {
+  if ((min < 0 || max < 0 || max < min) || (!Number.isIntegerisInteger(max) && !Number.isInteger(min) && max - min < 1)) {
+    return 'Введены некорректные данные';
   }
-
-  return min + Math.floor(Math.random() * (max + 1 - min));
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
-const getRandomFloatNumber = (min, max, digits) => {
-  min = Math.abs(min);
-  max = Math.abs(max);
-
-  if(min > max) {
-    return Number((max + Math.random() * (min - max)).toFixed(digits));
+// Получение случайного числа с плавающей точкой в заданном интервале, включая числа границ интервала
+const getRandomNumber = (min = 0, max = 1000000, fraction = 0) => {
+  if (fraction === 0) {
+    return getRandomInteger (min, max);
   }
 
-  return Number((min + Math.random() * (max - min)).toFixed(digits));
-};
-
-const getRandomElement = (elements) => elements[getRandomPositiveNumber(0, elements.length - 1)];
-
-const getRandomArray = (array) => {
-  const newArray = [];
-
-  for(let i = 0; i < getRandomPositiveNumber(1, array.length); i++){
-    newArray.push(array[i]);
+  if ((min < 0 || max < 0 || max < min || fraction < 0) || (!Number.isInteger(max) && !Number.isInteger(min) && max - min < 1 && fraction === 0)) {
+    return 'Введены некорректные данные';
   }
-  return newArray;
+
+  let fractionCorrection = 1;
+  for (let i = 0; i < fraction; i++) {
+    fractionCorrection *= 10;
+  }
+  max *= fractionCorrection;
+  min *= fractionCorrection;
+  return Math.trunc(Math.random() * (max - min + 1) + min) / fractionCorrection;
 };
+
+// Получение случайного элемента, неповторяющегося элемента и массива элементов
+
+const getRandomArrayElement = (elements) => {
+  const elementIndex = getRandomInteger(0, elements.length - 1);
+  return elements[elementIndex];
+};
+
+const getRandomUniqueArrayElement = (elements) => {
+  const elementsLength = elements.length;
+  if (elementsLength >= 1) {
+    const elementIndex = getRandomInteger(0, elementsLength - 1);
+    return elements.splice(elementIndex, 1).join();
+  }
+  return 'Данные не найдены.';
+};
+
+const getRandomArrayElements = (allElements) => {
+  const allLocalElements = allElements.slice();
+  const offerElements = [];
+  const offerElementsLength = getRandomInteger(1, allLocalElements.length);
+  for (let i = 0; i < offerElementsLength; i++) {
+    const elementIndex = getRandomInteger(0, allLocalElements.length - 1);
+    const offerElement = allLocalElements.splice(elementIndex, 1).join();
+    offerElements.push(offerElement);
+  }
+  return offerElements;
+};
+
+// Проверяем нажатие клавиши Esc
 
 const isEscapeKey = (evt) => evt.key === 'Escape';
+
+// Выводим сообщения из шаблонов
 
 const showAlert = (status) => {
   const alertTemplate = document.querySelector(`#${status}`).content.querySelector(`.${status}`);
   const alertElement = alertTemplate.cloneNode(true);
   document.body.append(alertElement);
 
-  document.addEventListener('click', (evt) => {
-    evt.preventDefault();
-    alertElement.remove();
-  });
+  const onDocumentClick = () => {
+    deleteElementAndListeners();
+  };
 
-  document.addEventListener('keydown', (evt) => {
+  const onDocumentKeydown = (evt) => {
     if (isEscapeKey(evt)) {
       evt.preventDefault();
-      alertElement.remove();
+      deleteElementAndListeners();
     }
-  });
+  };
+
+  function deleteElementAndListeners() {
+    alertElement.remove();
+    document.removeEventListener('click', onDocumentClick);
+    document.removeEventListener('keydown', onDocumentKeydown);
+  }
+
+  document.addEventListener('click', onDocumentClick);
+  document.addEventListener('keydown', onDocumentKeydown);
 };
 
-export {getRandomPositiveNumber, getRandomFloatNumber, getRandomElement, getRandomArray, isEscapeKey,
-  showAlert};
+const debounce = (callback, timeoutDelay) => {
+  let timeoutId;
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+  };
+};
+
+export {
+  getRandomNumber,
+  getRandomArrayElement,
+  getRandomUniqueArrayElement,
+  getRandomArrayElements,
+  isEscapeKey,
+  showAlert,
+  debounce
+};

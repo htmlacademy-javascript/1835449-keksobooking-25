@@ -1,15 +1,7 @@
 import {
   adForm,
   priceField
-} from './constants.js';
-
-const pristine = new Pristine(adForm, {
-  classTo: 'ad-form__element',
-  errorTextParent: 'ad-form__element',
-  errorTextClass: 'ad-form__error'
-});
-
-const validate = (element) => pristine.validate(element);
+} from './elements.js';
 
 const MinPrice = {
   BUNGALOW: 0,
@@ -18,6 +10,21 @@ const MinPrice = {
   HOUSE: 5000,
   PALACE: 10000
 };
+
+const RoomsOption = {
+  '1': ['1'],
+  '2': ['1', '2'],
+  '3': ['1', '2', '3'],
+  '100': ['0']
+};
+
+const pristine = new Pristine(adForm, {
+  classTo: 'ad-form__element',
+  errorTextParent: 'ad-form__element',
+  errorTextClass: 'ad-form__error'
+});
+
+const validate = (element) => pristine.validate(element);
 
 const validatePrice = (value) => {
   const unit = adForm.querySelector('[name="type"]');
@@ -34,24 +41,26 @@ const onTypeChange = (evt) => {
   validate(priceField);
 };
 
+const roomsField = adForm.querySelector('#room_number');
+const capacityField = adForm.querySelector('#capacity');
+
+const onRoomsChange = () => {
+  validate(capacityField);
+};
+
+const validateRooms = () => RoomsOption[roomsField.value].includes(capacityField.value);
+
+const getRoomsErrorMessage = () => `Максимальная вместимость, человек: ${roomsField.value === '100' ? 'не для гостей' : roomsField.value}`;
+
+const validateForm = () => pristine.validate();
+
+const resetValidation = () => pristine.reset();
+
 adForm
   .querySelectorAll('[name="type"]')
   .forEach((item) => item.addEventListener('change', onTypeChange));
 
 pristine.addValidator(priceField, validatePrice, getPriceErrorMessage);
-
-const roomsField = adForm.querySelector('#room_number');
-const capacityField = adForm.querySelector('#capacity');
-const roomsOption = {
-  '1': ['1'],
-  '2': ['1', '2'],
-  '3': ['1', '2', '3'],
-  '100': ['0']
-};
-
-const onRoomsChange = () => {
-  validate(capacityField);
-};
 
 adForm
   .querySelectorAll('[name="rooms"]')
@@ -61,13 +70,7 @@ adForm
   .querySelectorAll('[name="capacity"]')
   .forEach((item) => item.addEventListener('change', onRoomsChange));
 
-const validateRooms = () => roomsOption[roomsField.value].includes(capacityField.value);
-
-const getRoomsErrorMessage = () => `Максимальная вместимость, человек: ${roomsField.value === '100' ? 'не для гостей' : roomsField.value}`;
-
 pristine.addValidator(roomsField, validateRooms);
 pristine.addValidator(capacityField, validateRooms, getRoomsErrorMessage);
 
-const validateForm = () => pristine.validate();
-
-export {validateForm, validate};
+export {validateForm, validate, resetValidation};
